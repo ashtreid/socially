@@ -19,7 +19,7 @@ module.exports = {
                 countThoughts: await countThoughts(),
             };
 
-            res.json(thoughtObj, 'Retrieved all thoughts successfully');
+            res.json({ thoughtObj, message: 'Retrieved all thoughts successfully' });
         } catch (err) {
             console.log('ERROR! getAllThoughts:', err);
             return res.status(500).json(err);
@@ -38,7 +38,7 @@ module.exports = {
                 return res.status(404).json({ message: 'Cannot find a thought with that id' })
             }
 
-            res.json(thought, 'Retrieved a thought plus any associated reactions successfully');
+            res.json({thought, message: 'Retrieved a thought plus any associated reactions successfully'});
         } catch (err) {
             console.log('ERROR! getSingleThought:', err);
             return res.status(500).json(err);

@@ -33,18 +33,21 @@ module.exports = {
     async getSingleUser(req, res) {
         try {
             const userId = req.params.userId;
+            console.log("USER ID", userId);
 
-            const user = await User.findById(userId)
+            // const user = await User.findById(userId)
+            const user = await User.findOne({ _id: userId })
                 .select('-__v')
                 .populate('thoughts')
                 .populate('friends');
+                
             if (!user) {
                 return res.status(404).json({ message: 'Cannot find a user with that id' })
             }
 
-            res.json({ 
-                user, 
-                message: 'Retrieved a user plus any associated thoughts and friends successfully' 
+            res.json({
+                user,
+                message: 'Retrieved a user plus any associated thoughts and friends successfully'
             });
         } catch (err) {
             console.log('ERROR! getSingleUser:', err);
@@ -56,9 +59,9 @@ module.exports = {
     async createUser(req, res) {
         try {
             const user = await User.create(req.body);
-            res.json({ 
-                user, 
-                message: 'User created successfully' 
+            res.json({
+                user,
+                message: 'User created successfully'
             });
         } catch (err) {
             console.log('ERROR! createUser:', err);
@@ -86,9 +89,9 @@ module.exports = {
                     .json({ message: 'Could not find a user with that id when trying to edit' })
             }
 
-            res.json({ 
-                user, 
-                message: 'User updated successfully' 
+            res.json({
+                user,
+                message: 'User updated successfully'
             });
         } catch (err) {
             console.log('ERROR! editUser:', err);
