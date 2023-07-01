@@ -1,5 +1,7 @@
 // const { ObjectId } = require('mongoose').Types;
 const { User, Thought } = require('../models');
+const mongoose = require('mongoose');
+
 
 const countUsers = async () => {
     const numberUserCount = await User
@@ -40,7 +42,7 @@ module.exports = {
                 .select('-__v')
                 .populate('thoughts')
                 .populate('friends');
-                
+
             if (!user) {
                 return res.status(404).json({ message: 'Cannot find a user with that id' })
             }
@@ -102,17 +104,20 @@ module.exports = {
     // DELETE to remove a user by its _id
     async deleteUser(req, res) {
         try {
-            const userId = req.body.userId;
-
+            const userId = req.params.userId;
+            console.log("USERID TO DELETE:", userId);
             // NOTE: .findOneAndRemove() is deprecated, don't use
-            const user = await User.findByIdAndDelete(userId);
+            const user = await User.findOneAndDelete({ _id: userId });
+            console.log("USER TO DELETE:", user);
 
             if (!user) {
                 return res.status(404).json({ message: `Cannot find user to delete` });
             }
 
             // Remove a user's associated thoughts when deleted.
-            const thoughts = await Thought.deleteMany({ user: userId });
+            // const thoughts = await Thought.deleteMany({ user: userId });
+            const thoughts = await Thought.deleteMany({ userId });
+            console.log("THOUGHTS FOR DELETING:", thoughts);
 
             if (thoughts.deletedCount === 0) {
                 return res.json({ message: 'No thoughts associated with the user to delete' })
@@ -131,8 +136,6 @@ module.exports = {
 
     // POST to add a new friend to a user's friend list
     async addToFriendList(req, res) {
-        console.log('Adding a friend to a user');
-        console.log(req.body);
         try {
             const { userId, friendId } = req.params;
 
@@ -146,9 +149,15 @@ module.exports = {
                 return res.status(404).json({ message: 'Cannot add friend - Cannot find friend with that id' });
             }
 
+            const checkUser = await User.findById(userId);
+
+            if (checkUser.friends.includes(friendId)) {
+                return res.status(400).json({ message: 'Friend already exists in the user\'s friend list' });
+            }
+
             const user = await User.findByIdAndUpdate(
                 userId,
-                { $addToSet: { friends: { friendId: friendId } } },
+                { $addToSet: { friends: friendId } },
                 { runValidators: true, new: true }
             );
 
@@ -158,6 +167,10 @@ module.exports = {
                     .json({ message: 'Cannot find user with that id' })
             }
 
+            res.json({
+                user,
+                message: 'Friend added successfully'
+            });
         } catch (err) {
             console.log('ERROR! addToFriendList:', err);
             res.status(500).json(err);
@@ -181,7 +194,7 @@ module.exports = {
 
             const user = await User.findByIdAndUpdate(
                 userId,
-                { $pull: { friends: { friendId: friendId } } },
+                { $pull: { friends: friendId } },
                 { runValidators: true, new: true }
             );
 
@@ -190,6 +203,11 @@ module.exports = {
                     .status(404)
                     .json({ message: 'Cannot find user with that id' })
             }
+
+            res.json({
+                user,
+                message: 'Friend deleted successfully'
+            });
         } catch (err) {
             console.log('ERROR! removeFromFriendList:', err);
             res.status(500).json(err);

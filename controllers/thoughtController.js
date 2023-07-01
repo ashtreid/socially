@@ -105,10 +105,12 @@ module.exports = {
     // DELETE to remove a thought by its _id
     async deleteThought(req, res) {
         try {
-            const thoughtId = req.body.thoughtId;
+            const thoughtId = req.params.thoughtId;
+            console.log("THOUGHT ID:", thoughtId);
 
             // NOTE: .findOneAndRemove() is deprecated, don't use
             const thought = await Thought.findByIdAndDelete(thoughtId);
+            console.log("THOUGHT TO FIND BY ID AND DELETE:", thought);
 
             if (!thought) {
                 return res.status(404).json({ message: `Cannot find thought to delete` });
