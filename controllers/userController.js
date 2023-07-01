@@ -105,22 +105,16 @@ module.exports = {
     async deleteUser(req, res) {
         try {
             const userId = req.params.userId;
-            console.log("USERID TO DELETE:", userId);
-            // NOTE: .findOneAndRemove() is deprecated, don't use
             const user = await User.findOneAndDelete({ _id: userId });
-            console.log("USER TO DELETE:", user);
 
             if (!user) {
                 return res.status(404).json({ message: `Cannot find user to delete` });
             }
 
-            // Remove a user's associated thoughts when deleted.
-            // const thoughts = await Thought.deleteMany({ user: userId });
-            const thoughts = await Thought.deleteMany({ userId });
-            console.log("THOUGHTS FOR DELETING:", thoughts);
-
+            const thoughts = await Thought.deleteMany({ _id: {$in: user.thoughts} });
+            
             if (thoughts.deletedCount === 0) {
-                return res.json({ message: 'No thoughts associated with the user to delete' })
+                return res.json({ message: 'User deleted, but no thoughts associated with the user to delete' })
             }
 
             res.json({
