@@ -1,4 +1,3 @@
-// const { ObjectId } = require('mongoose').Types;
 const { User, Thought } = require('../models');
 
 const countThoughts = async () => {
@@ -45,7 +44,7 @@ module.exports = {
         }
     },
 
-    // POST to create a new thought (don't forget to push the created thought's _id to the associated user's thoughts array field)
+    // POST to create a new thought and pushes the created thought's _id to the associated user's thoughts array field
     async createThought(req, res) {
         try {
             const thought = await Thought.create(req.body);
@@ -74,9 +73,6 @@ module.exports = {
 
     // PUT to update a thought by its _id
     async editThought(req, res) {
-        console.log('Editing a thought');
-        console.log('THOUGHT REQ BODY:', req.body);
-
         try {
             const thoughtId = req.params.thoughtId;
 
@@ -106,11 +102,8 @@ module.exports = {
     async deleteThought(req, res) {
         try {
             const thoughtId = req.params.thoughtId;
-            console.log("THOUGHT ID:", thoughtId);
 
-            // NOTE: .findOneAndRemove() is deprecated, don't use
             const thought = await Thought.findByIdAndDelete(thoughtId);
-            console.log("THOUGHT TO FIND BY ID AND DELETE:", thought);
 
             if (!thought) {
                 return res.status(404).json({ message: `Cannot find thought to delete` });

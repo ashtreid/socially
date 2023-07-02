@@ -1,7 +1,4 @@
-// const { ObjectId } = require('mongoose').Types;
 const { User, Thought } = require('../models');
-const mongoose = require('mongoose');
-
 
 const countUsers = async () => {
     const numberUserCount = await User
@@ -35,9 +32,7 @@ module.exports = {
     async getSingleUser(req, res) {
         try {
             const userId = req.params.userId;
-            console.log("USER ID", userId);
 
-            // const user = await User.findById(userId)
             const user = await User.findOne({ _id: userId })
                 .select('-__v')
                 .populate('thoughts')
@@ -73,9 +68,6 @@ module.exports = {
 
     // PUT to update a user by its _id
     async editUser(req, res) {
-        console.log('Editing a user');
-        console.log('USER REQ BODY:', req.body);
-
         try {
             const userId = req.params.userId;
 

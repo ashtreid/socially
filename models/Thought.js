@@ -70,7 +70,3 @@ thoughtSchema.virtual('reactionCount').get(function () {
 const Thought = model('thought', thoughtSchema);
 
 module.exports = Thought;
-
-
-// Getters can change the way existing fields look when you read them, like magic tricks for fields. 
-// Virtuals are like imaginary fields that can give you new information without changing the original data.
