@@ -114,7 +114,11 @@ module.exports = {
             const thoughts = await Thought.deleteMany({ _id: {$in: user.thoughts} });
             
             if (thoughts.deletedCount === 0) {
-                return res.json({ message: 'User deleted, but no thoughts associated with the user to delete' })
+                return res.json({
+                    user,
+                    thoughts,
+                    message: 'User deleted, but no thoughts associated with the user to delete' 
+                })
             }
 
             res.json({
